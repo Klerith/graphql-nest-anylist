@@ -44,13 +44,20 @@ export class UsersService {
 
   async findAll( roles: ValidRoles[] ): Promise<User[]> {
 
-    if ( roles.length === 0 ) return this.usersRepository.find();
+    if ( roles.length === 0 ) 
+      return this.usersRepository.find({
+        relations: {
+          lastUpdateBy: true
+        },
+      });
 
     // ??? tenemos roles ['admin','superUser']
-    return this.usersRepository.createQueryBuilder()
+    return this.usersRepository.createQueryBuilder('users')
+      .leftJoin(User, 'usersB', 'users.lastUpdateBy = usersB.id')
       .andWhere('ARRAY[roles] && ARRAY[:...roles]')
-      .setParameter('roles', roles )
-      .getMany();
+      // .relation(User, 'user.lastUpdateBy')
+      // .getMany();
+      .execute();
     
   }
 
@@ -78,8 +85,15 @@ export class UsersService {
     return `This action updates a #${id} user`;
   }
 
-  block(id: string): Promise<User> {
-    throw new Error(`block method not implemented`);
+  async block( id: string, adminUser: User ): Promise<User> {
+    
+    const userToBlock = await this.findOneById( id );
+
+    userToBlock.isActive = false;
+    userToBlock.lastUpdateBy = adminUser;
+
+    return await this.usersRepository.save( userToBlock );
+
   }
 
 
