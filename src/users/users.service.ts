@@ -46,19 +46,19 @@ export class UsersService {
 
     if ( roles.length === 0 ) 
       return this.usersRepository.find({
-        relations: {
-          lastUpdateBy: true
-        },
+        // TODO: No es necesario porque tenemos lazy la propiedad lastUpdateBy
+        // relations: {
+        //   lastUpdateBy: true
+        // }
       });
 
     // ??? tenemos roles ['admin','superUser']
-    return this.usersRepository.createQueryBuilder('users')
-      .leftJoin(User, 'usersB', 'users.lastUpdateBy = usersB.id')
+    return this.usersRepository.createQueryBuilder()
       .andWhere('ARRAY[roles] && ARRAY[:...roles]')
-      // .relation(User, 'user.lastUpdateBy')
-      // .getMany();
-      .execute();
-    
+      .setParameter('roles', roles )
+      .getMany();
+
+  
   }
 
   async findOneByEmail( email: string ): Promise<User> {
@@ -81,8 +81,27 @@ export class UsersService {
     }
   }
 
-  update(id: number, updateUserInput: UpdateUserInput) {
-    return `This action updates a #${id} user`;
+  async update(
+    id: string, 
+    updateUserInput: UpdateUserInput,
+    updateBy: User
+  ): Promise<User> {
+
+    try {
+      const user = await this.usersRepository.preload({
+        ...updateUserInput,
+        id
+      });
+
+      user.lastUpdateBy = updateBy;
+
+      return await this.usersRepository.save( user );
+
+    } catch (error) {
+      this.handleDBErrors( error );
+    }
+    
+    
   }
 
   async block( id: string, adminUser: User ): Promise<User> {
