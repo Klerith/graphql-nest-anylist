@@ -14,7 +14,7 @@ import { UsersResolver } from './users.resolver';
     ItemsModule,
   ],
   exports: [
-    // TypeOrmModule,
+    TypeOrmModule,
     UsersService
   ]
 })
