@@ -2,6 +2,7 @@ import { ObjectType, Field, Int, ID } from '@nestjs/graphql';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Item } from './../../items/entities/item.entity';
+import { List } from './../../lists/entities/list.entity';
 
 
 @Entity({ name: 'users' })
@@ -48,5 +49,9 @@ export class User {
   @OneToMany( () => Item, (item) => item.user, { lazy: true })
   // @Field( () => [Item] )
   items: Item[];
+
+  @OneToMany( () => List, (list) => list.user )
+  // @Field( () => [Item] )
+  lists: List[];
 
 }

@@ -1,3 +1,4 @@
+import { ListsModule } from './../lists/lists.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 
@@ -12,6 +13,7 @@ import { UsersResolver } from './users.resolver';
   imports: [
     TypeOrmModule.forFeature([ User ]),
     ItemsModule,
+    ListsModule,
   ],
   exports: [
     TypeOrmModule,
