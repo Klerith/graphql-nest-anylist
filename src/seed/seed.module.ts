@@ -1,3 +1,5 @@
+import { ListsModule } from './../lists/lists.module';
+import { ListItemModule } from './../list-item/list-item.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
@@ -12,6 +14,8 @@ import { SeedResolver } from './seed.resolver';
   imports: [
     ConfigModule,
     ItemsModule,
+    ListItemModule,
+    ListsModule,
     UsersModule,
   ]
 })
