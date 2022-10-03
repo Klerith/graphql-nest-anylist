@@ -31,7 +31,9 @@ export class ListItemService {
       list: { id: listId }
     });
 
-    return this.listItemsRepository.save( newListItem );
+    await this.listItemsRepository.save( newListItem );
+
+    return this.findOne( newListItem.id );
   }
 
   async findAll( list: List, paginationArgs: PaginationArgs, searchArgs: SearchArgs ): Promise<ListItem[]> {
