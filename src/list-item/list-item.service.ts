@@ -37,17 +37,18 @@ export class ListItemService {
   }
 
   async findAll( list: List, paginationArgs: PaginationArgs, searchArgs: SearchArgs ): Promise<ListItem[]> {
-    
+
     const { limit, offset } = paginationArgs;
     const { search } = searchArgs;
     
-    const queryBuilder = this.listItemsRepository.createQueryBuilder()
+    const queryBuilder = this.listItemsRepository.createQueryBuilder('listItem') // <-- Nombre para las relaciones
+      .innerJoin('listItem.item','item') // <--- Lo añadí después, fue un problema que no grabé
       .take( limit )
       .skip( offset )
       .where(`"listId" = :listId`, { listId: list.id });
 
     if ( search ) {
-      queryBuilder.andWhere('LOWER(name) like :name', { name: `%${ search.toLowerCase() }%` });
+      queryBuilder.andWhere('LOWER(item.name) like :name', { name: `%${ search.toLowerCase() }%` });
     }
 
     return queryBuilder.getMany();
